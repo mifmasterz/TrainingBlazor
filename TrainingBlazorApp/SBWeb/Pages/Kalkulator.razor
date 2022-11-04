@@ -1,0 +1,52 @@
+﻿@page "/kalkulator/{NamaKalkulator}"
+@page "/kalkulator"
+<h3>Kalkulator @NamaKalkulator</h3>
+<table>
+    <tr>
+        <td>Isian</td>
+        <td>Nilai</td>
+    </tr>
+    <tr>
+        <td>Nilai 1</td>
+        <td><input @bind="Nilai1" type="text" /></td>
+    </tr>
+    <tr>
+        <td>Nilai 2</td>
+        <td><input @bind="Nilai2" type="text" /></td>
+    </tr>
+
+    <tr>
+        <td colspan="2">
+            Hasil: @Hasil.ToString("n0")
+        </td>
+    </tr> 
+    <tr>
+        <td colspan="2">
+           <button class="btn btn-primary" @onclick="()=>Hitung('+')">Tambah</button>
+           <button class="btn btn-primary" @onclick="()=>Hitung('*')">Kali</button>
+           <button class="btn btn-primary" @onclick="()=>Hitung('/')">Bagi</button>
+           <button class="btn btn-primary" @onclick="()=>Hitung('-')">Kurang</button>
+        </td>
+    </tr>
+</table>
+@code {
+    [Parameter]
+    public string NamaKalkulator { set; get; }
+    double Nilai1, Nilai2, Hasil;
+
+    void Hitung(char Op)
+    {
+        switch (Op)
+        {
+            case '+':
+                Hasil = Nilai1 + Nilai2;
+                break; 
+            case '*':
+                Hasil = Nilai1 * Nilai2;
+                break;
+            default:
+                Hasil = 0;
+                break;
+        }
+    }
+}

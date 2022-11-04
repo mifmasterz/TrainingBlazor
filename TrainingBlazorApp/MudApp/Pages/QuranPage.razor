@@ -1,0 +1,53 @@
+﻿@page "/QuranPage"
+<h3>Quran Page</h3>
+
+<MudSimpleTable Style="overflow-x: auto;">
+    <thead>
+        <tr>
+            
+                <th>No</th>
+                <th>Surat</th>
+                <th>Latin</th>
+                <th>Place</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @if(datas!=null)
+        @foreach (var row in datas)
+        {
+            <tr>
+               
+                    <td>@row.idx</td>
+                    <td>@row.name</td>
+                    <td>@row.latin</td>
+                    <td>@row.place</td>
+                
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+<MudButton ButtonType="ButtonType.Button" @onclick="GetSurah" >Tarik Surat</MudButton>
+@code {
+    SurahObj[] datas;
+    async Task GetSurah()
+    {
+        var url = "https://quran-api.my.id/api/Surah/GetSurah";
+        var client = new HttpClient();
+        datas = await client.GetFromJsonAsync<SurahObj[]>(url);
+        if (datas != null)
+        {
+            
+        }
+    }
+
+    public class SurahObj
+    {
+        public int idx { get; set; }
+        public int totalayah { get; set; }
+        public string name { get; set; }
+        public string latin { get; set; }
+        public string place { get; set; }
+    }
+
+}

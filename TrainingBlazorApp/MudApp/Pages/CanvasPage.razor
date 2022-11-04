@@ -1,0 +1,40 @@
+﻿@using Blazor.Extensions
+@using Blazor.Extensions.Canvas.Canvas2D
+@page "/CanvasPage"
+<h3>CanvasPage</h3>
+<BECanvas Width="640" Height="480" @ref="_canvasReference"></BECanvas>
+@code {
+    private Canvas2DContext _context;
+
+    protected BECanvasComponent _canvasReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        this._context = await this._canvasReference.CreateCanvas2DAsync();
+        if(firstRender)
+         Animate();
+    }
+
+    async void Animate()
+    {
+        var ax = 0;
+        var geser = 2;
+        while (true)
+        {
+
+            await this._context.ClearRectAsync(0,0,640,480);
+
+            await this._context.SetFillStyleAsync("green");
+
+            await this._context.FillRectAsync(10, 100, 100, 100);
+
+            await this._context.SetFontAsync("64px serif");
+            await this._context.StrokeTextAsync("Hello Temen Magang !!!", ax, 100);
+            ax += geser;
+            if (ax > 640) geser = -geser;
+            else if (ax < 0) geser = -geser;
+            ax += geser;
+            Task.Delay(100);
+        }
+    }
+}

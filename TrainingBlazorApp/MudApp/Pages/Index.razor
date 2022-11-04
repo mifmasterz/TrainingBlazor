@@ -1,0 +1,43 @@
+﻿@page "/"
+@inject NavigationManager NavMgr
+
+<PageTitle>Index</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
+<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
+<MudAlert Severity="Severity.Normal">You can find documentation and examples on our website here: <MudLink Href="https://mudblazor.com" Typo="Typo.body2" Color="Color.Inherit"><b>www.mudblazor.com</b></MudLink></MudAlert>
+<MudButton Class="mt-2" @onclick="GoToUploadPage" Variant="Variant.Filled">Go To Upload Page</MudButton>
+<MudButton Class="mt-2" @onclick="GoToQrPage" Variant="Variant.Filled">Go To QR Page</MudButton>
+<MudButton Class="mt-2" @onclick="GoToCanvasPage" Variant="Variant.Filled">Go To Canvas Page</MudButton>
+<MudButton Class="mt-2" @onclick="GoToQuranPage" Variant="Variant.Filled">Go To Quran Page</MudButton>
+<MudButton Class="mt-2" @onclick="GoToCubePage" Variant="Variant.Filled">Go To Cube 3D Page</MudButton>
+<MudButton Class="mt-2" @onclick="GoToModelPage" Variant="Variant.Filled">Go To Model 3D Page</MudButton>
+
+@code{
+    void GoToUploadPage()
+    {
+        NavMgr.NavigateTo("/UploadPage");
+    } 
+    void GoToQrPage()
+    {
+        NavMgr.NavigateTo("/QrCodeGenerator");
+    } 
+    
+    void GoToCanvasPage()
+    {
+        NavMgr.NavigateTo("/CanvasPage");
+    }
+    
+    void GoToQuranPage()
+    {
+        NavMgr.NavigateTo("/QuranPage");
+    }  
+    void GoToCubePage()
+    {
+        NavMgr.NavigateTo("/CubePage");
+    } 
+    void GoToModelPage()
+    {
+        NavMgr.NavigateTo("/ModelPage");
+    }
+}

@@ -1,0 +1,66 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using MudApp.Data
+@using QRCoder
+@using System.Drawing
+@page "/QrCodeGenerator"
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="QR Content" HelperText="ketik teks"
+                                  @bind-Value="QRText" />
+                       </MudCardContent>
+                <MudCardActions>
+                    <MudButton @onclick="GenerateQR" ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="ml-auto">Generate QR</MudButton>
+                    <MudButton @onclick="GenerateCaptcha" ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="MudBlazor.Color.Info" Class="ml-auto">Generate Captcha</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4 mud-height-full">
+                @if(QRImage?.Length>0){
+                     <MudImage Src="@QRImage" Alt="QR" Elevation="25" Class="rounded-lg" />
+                }
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4 mud-height-full">
+            @if (CaptchaImage?.Length > 0)
+            {
+                <MudImage Src="@CaptchaImage" Alt="QR" Elevation="25" Class="rounded-lg" />
+                }
+            </MudPaper>
+        </MudItem>
+       
+    </MudGrid>
+@code {
+    string Answer, CaptchaImage;
+    void GenerateCaptcha()
+    {
+        Random oRandom = new Random();
+        int iNumber = oRandom.Next(100000, 999999);
+        Answer = iNumber.ToString();
+        var temp = CaptchaGenerator.GetCaptcha(Answer, 240, 120);
+        string base64String = Convert.ToBase64String(temp, 0, temp.Length);
+        CaptchaImage = "data:image/png;base64," + base64String;
+    }
+    string QRImage;
+    string QRText="123qwe";
+    public static byte[] ImageToByte(Image img)
+    {
+        ImageConverter converter = new ImageConverter();
+        return (byte[])converter.ConvertTo(img, typeof(byte[]));
+    }
+    async Task GenerateQR()
+    {
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(QRText, QRCodeGenerator.ECCLevel.Q);
+
+        QRCoder.BitmapByteQRCode qrCode = new QRCoder.BitmapByteQRCode(qrCodeData);
+      
+        var bytes = qrCode.GetGraphic(20);
+        string base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+        QRImage = "data:image/png;base64," + base64String;
+    }
+}

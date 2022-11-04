@@ -1,0 +1,142 @@
+﻿@page "/uploadpage"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" />
+                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="pwField1"
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!" />
+                <MudTextField T="string"
+                              Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+                              Validation="@(new Func<string, string>(PasswordMatch))" />
+                <div class="d-flex">
+                    <MudRadioGroup T="string" Required="true" RequiredError="Account type is required!">
+                        <MudRadio Option="@("Personal")">Personal</MudRadio>
+                        <MudRadio Option="@("Professional")">Professional</MudRadio>
+                    </MudRadioGroup>
+                </div>
+                <div class="d-flex align-center justify-space-between">
+                    <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+                </div>
+                  <div class="d-flex align-center justify-space-between">
+                <InputFile id="fileInput2" OnChange="UploadFiles" multiple />
+                </div>
+                @if (files != null)
+                {
+                    <MudList>
+                        @foreach (var file in files)
+                        {
+                            <MudListItem Icon="@Icons.Filled.AttachFile">
+                                @file.Name <code>@file.Size bytes</code>
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+            </MudForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>form.Validate())">Validate</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.Reset())" Class="mx-2">Reset</MudButton>
+            <MudButton Variant="Variant.Filled" DisableElevation="true" OnClick="@(()=>form.ResetValidation())">Reset Validation</MudButton>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+                @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+<MudPaper>
+    @if (ImageData.Count > 0)
+    {
+        foreach(var imagestr in ImageData)
+        {
+            <div class="d-flex justify-center">
+                <MudImage ObjectFit="ObjectFit.Cover" Height="200" Width="400" Src="@imagestr" Alt="img" Elevation="25" Class="rounded-lg" />
+            </div>
+
+        }
+    }
+</MudPaper>
+
+
+@code {
+    List<string> ImageData = new();
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        var targetDir = Path.GetTempPath() + "TempFiles/";
+        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            files.Add(file);
+            var path = targetDir + file.Name;
+            var ms = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(ms);
+            File.WriteAllBytes(path, ms.ToArray());
+
+
+        }
+        //TODO upload the files to the server
+        LoadImages();
+    }
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        LoadImages();
+    }
+    void LoadImages()
+    {
+        ImageData.Clear();
+        var targetDir = Path.GetTempPath() + "TempFiles/";
+        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+        string supportedExtensions = "*.jpg,*.gif,*.png,*.bmp,*.jpe,*.jpeg,*.wmf,*.emf,*.xbm,*.ico,*.eps,*.tif,*.tiff,*.g01,*.g02,*.g03,*.g04,*.g05,*.g06,*.g07,*.g08";
+
+        var fileImages = Directory.GetFiles(targetDir, "*.*").Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower())).ToList();
+        foreach(var item in fileImages)
+        {
+            var fileBytes = File.ReadAllBytes(item);
+            string base64String = Convert.ToBase64String(fileBytes, 0, fileBytes.Length);
+            var imageStr = "data:image/png;base64," + base64String;
+            ImageData.Add(imageStr);
+        }
+    }
+}

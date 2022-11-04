@@ -1,0 +1,38 @@
+﻿@page "/localstorage"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+<h3>LocalStoragePage</h3>
+<div>
+    <div class="form-group">
+        <label for="nama">Nama</label>
+        <input type="text" @bind="Nama1" class="form-control" id="nama" aria-describedby="nama">
+        <small id="nama-help" class="form-text text-muted">Masukan nama Anda</small>
+    </div> 
+    <div class="form-group">
+        <label for="nama2">Nama</label>
+        <input type="text" @bind="Nama2" class="form-control" id="nama2" aria-describedby="nama" >
+        <small id="nama-help2" class="form-text text-muted">Data dari local storage</small>
+    </div>
+   
+    <button type="button" @onclick="Simpan" class="btn btn-primary">Submit</button>
+</div>
+
+@code {
+    string Nama1, Nama2;
+
+    async Task Simpan()
+    {
+        await localStorage.SetItemAsync("name", Nama1);
+    }
+
+    async Task LoadData()
+    {
+        Nama2 = await localStorage.GetItemAsync<string>("name");
+        await InvokeAsync(StateHasChanged);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+       await LoadData();
+
+    }
+
+}

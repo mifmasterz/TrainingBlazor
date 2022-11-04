@@ -1,0 +1,48 @@
+﻿@page "/sessionstorage"
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h3>Session Storage Page</h3>
+<div>
+    <div class="form-group">
+        <label for="nama">Nama</label>
+        <input type="text" @bind="Nama1" class="form-control" id="nama" aria-describedby="nama">
+        <small id="nama-help" class="form-text text-muted">Masukan nama Anda</small>
+    </div>
+    <div class="form-group">
+        <label for="nama2">Nama</label>
+        <input type="text" @bind="Nama2" class="form-control" id="nama2" aria-describedby="nama">
+        <small id="nama-help2" class="form-text text-muted">Data dari local storage</small>
+    </div>
+
+    <button type="button" @onclick="Simpan" class="btn btn-primary">Submit</button>
+</div>
+
+@code {
+    string Nama1, Nama2;
+
+    async Task Simpan()
+    {
+       await sessionStorage.SetItemAsync("name", Nama1);
+
+    }
+
+    async Task LoadData()
+    {
+        try
+        {
+            Nama2 = await sessionStorage.GetItemAsync<string>("name");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+      
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await LoadData();
+
+    }
+
+}

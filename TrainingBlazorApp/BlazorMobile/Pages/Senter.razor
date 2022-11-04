@@ -1,0 +1,50 @@
+﻿@page "/senter"
+<h3>Senter</h3>
+<button @onclick="On" class="btn btn-primary">Nyala</button>
+<button @onclick="Off" class="btn btn-danger">Mati</button>
+@code {
+    async Task On()
+    {
+        try
+        {
+
+            await Flashlight.Default.TurnOnAsync();
+
+        }
+        catch (FeatureNotSupportedException ex)
+        {
+            // Handle not supported on device exception
+        }
+        catch (PermissionException ex)
+        {
+            // Handle permission exception
+        }
+        catch (Exception ex)
+        {
+            // Unable to turn on/off flashlight
+        }
+    }
+
+    async Task Off()
+    {
+        try
+        {
+
+
+            await Flashlight.Default.TurnOffAsync();
+
+        }
+        catch (FeatureNotSupportedException ex)
+        {
+            // Handle not supported on device exception
+        }
+        catch (PermissionException ex)
+        {
+            // Handle permission exception
+        }
+        catch (Exception ex)
+        {
+            // Unable to turn on/off flashlight
+        }
+    }
+}
